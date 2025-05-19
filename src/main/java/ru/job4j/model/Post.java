@@ -18,11 +18,22 @@ public class Post {
             return false;
         }
         Post post = (Post) o;
-        return Objects.equals(id, post.id) && Objects.equals(link, post.link) && Objects.equals(time, post.time);
+        return Objects.equals(link, post.link);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, link, time);
+        return Objects.hash(link);
+    }
+
+    @Override
+    public String toString() {
+        return "Post{"
+                + "id=" + id
+                + ", title='" + title + '\''
+                + ", link='" + link + '\''
+                + ", description='" + description + '\''
+                + ", time=" + time
+                + '}';
     }
 }
