@@ -1,0 +1,43 @@
+package ru.job4j.grabber.service;
+
+import org.apache.log4j.Logger;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.Properties;
+
+public class Config {
+    private static final Logger LOG = Logger.getLogger(Config.class);
+    private final Properties properties = new Properties();
+
+    public void load(String file) {
+        try (var input = new BufferedReader(new FileReader(file))) {
+            properties.load(input);
+        } catch (IOException io) {
+            LOG.error(String.format("When load file : %s", file), io);
+        }
+    }
+
+    public Connection initConnection() {
+        Connection result = null;
+        try {
+            Class.forName(get("db.driver-class-name"));
+            result = DriverManager.getConnection(
+                    get("db.url"),
+                    get("db.username"),
+                    get("db.password")
+            );
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    public String get(String key) {
+        return properties.getProperty(key);
+    }
+}
