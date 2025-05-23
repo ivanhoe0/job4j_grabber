@@ -38,16 +38,30 @@ public class HabrCareerParse implements Parse {
                     Long time = Timestamp.valueOf(LocalDateTime.from(formatter.parse(vacancyDate))).getTime();
                     String link = String.format("%s%s", SOURCE_LINK,
                             linkElement.attr("href"));
+                    var description = retrieveDescription(link);
                     var post = new Post();
                     post.setTitle(vacancyName);
                     post.setLink(link);
-                    post.setDescription(vacancyDate);
+                    post.setDescription(description);
                     post.setTime(time);
                     result.add(post);
                 });
             }
         } catch (IOException e) {
             LOG.error("When load page", e);
+        }
+        return result;
+    }
+
+    private String retrieveDescription(String link) {
+        String result = "";
+        try {
+            var connection = Jsoup.connect(link);
+            var document = connection.get();
+            var row = document.select(".vacancy-description__text");
+            result = row.text();
+        } catch (IOException e) {
+            LOG.error("When retrieve a description", e);
         }
         return result;
     }
