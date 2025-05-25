@@ -3,6 +3,8 @@ package ru.job4j.grabber.service;
 import org.apache.log4j.Logger;
 import org.jsoup.Jsoup;
 import ru.job4j.grabber.model.Post;
+import ru.job4j.grabber.utils.DateTimeParser;
+import ru.job4j.grabber.utils.HabrCareerDateTimeParser;
 
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -19,6 +21,12 @@ public class HabrCareerParse implements Parse {
 
     private static final int NUMBER_OF_PAGES_TO_PARSE = 5;
 
+    private final DateTimeParser dateTimeParser;
+
+    public HabrCareerParse(DateTimeParser dateTimeParser) {
+        this.dateTimeParser = dateTimeParser;
+    }
+
     @Override
     public List<Post> fetch() {
         var result = new ArrayList<Post>();
@@ -34,8 +42,7 @@ public class HabrCareerParse implements Parse {
                     var linkElement = titleElement.child(0);
                     String vacancyName = titleElement.text();
                     String vacancyDate = dateElement.child(0).attr("datetime");
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss[XXX][X]");
-                    Long time = Timestamp.valueOf(LocalDateTime.from(formatter.parse(vacancyDate))).getTime();
+                    Long time = Timestamp.valueOf(dateTimeParser.parse(vacancyDate)).getTime();
                     String link = String.format("%s%s", SOURCE_LINK,
                             linkElement.attr("href"));
                     var description = retrieveDescription(link);
@@ -67,7 +74,8 @@ public class HabrCareerParse implements Parse {
     }
 
     public static void main(String[] args) {
-        var parser = new HabrCareerParse();
+        var dateTimeParser = new HabrCareerDateTimeParser();
+        var parser = new HabrCareerParse(dateTimeParser);
         parser.fetch().forEach(p -> System.out.printf("%s %s %s%n", p.getTitle(), p.getLink(), new Timestamp(p.getTime())));
     }
 }
