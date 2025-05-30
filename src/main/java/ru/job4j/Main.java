@@ -1,24 +1,19 @@
 package ru.job4j;
 
 import ru.job4j.grabber.model.Post;
-import ru.job4j.grabber.service.Config;
-import ru.job4j.grabber.service.SchedulerManager;
-import ru.job4j.grabber.service.SuperJobGrab;
-import ru.job4j.grabber.service.Web;
+import ru.job4j.grabber.service.*;
 import ru.job4j.grabber.stores.JdbcStore;
 import ru.job4j.grabber.stores.MemStore;
+import ru.job4j.grabber.utils.HabrCareerDateTimeParser;
 
 public class Main {
     public static void main(String[] args) {
         var config = new Config();
         config.load("application.properties");
         var store = new JdbcStore(config.initConnection());
-        var post = new Post();
-        post.setTitle("Super Java Job");
-        post.setDescription("Super Java Job");
-        post.setTime(30L);
-        post.setLink("Super Java Job");
-        store.save(post);
+        var dateTime = new HabrCareerDateTimeParser();
+        var parser = new HabrCareerParse(dateTime);
+        parser.fetch().forEach(store::save);
         var scheduler = new SchedulerManager();
         scheduler.init();
         scheduler.load(

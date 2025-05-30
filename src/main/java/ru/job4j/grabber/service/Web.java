@@ -22,6 +22,9 @@ public class Web {
         store.getAll().forEach(post -> page.append(post.toString()).append(System.lineSeparator()));
 
         // Настраиваем обработчик для корневого URL
-        app.get("/", ctx -> ctx.result(page.toString()));
+        app.get("/", ctx -> {
+            ctx.contentType("text/html; charset=utf-8");
+            ctx.result(page.toString());
+        });
     }
 }
