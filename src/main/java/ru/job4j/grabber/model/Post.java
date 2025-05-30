@@ -9,7 +9,7 @@ public class Post {
     private String description;
     private Long time;
 
-    public Post(Long id, String title, String link, String description, Long time) {
+    public Post(Long id, String title, String description, String link, Long time) {
         this.id = id;
         this.title = title;
         this.link = link;
